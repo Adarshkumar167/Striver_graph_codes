@@ -278,3 +278,107 @@ public:
     }
 };
 
+
+
+
+31. Word Ladder II - Optimized Approach for leetcode
+____________________________________________________
+
+class Solution {
+    unordered_map<string, int> mpp;
+    vector<vector<string>> ans;
+    string b;
+private:
+    void dfs(string word, vector<string>& seq) {
+        if(word == b) {
+            reverse(seq.begin(), seq.end());
+            ans.push_back(seq);
+            reverse(seq.begin(), seq.end());
+            return;
+        }
+        int steps = mpp[word];
+        int sz = word.size();
+        for(int i = 0; i < sz; i++) {
+            char original = word[i];
+                for(char ch = 'a'; ch <= 'z'; ch++){
+                    word[i] = ch;
+                    if(mpp.find(word) != mpp.end() && mpp[word] + 1 == steps) {
+                        seq.push_back(word);
+                        dfs(word, seq);
+                        seq.pop_back();
+                    }
+                }
+            word[i] = original;
+        }
+    }
+public:
+    vector<vector<string>> findLadders(string beginWord, string endWord, vector<string>& wordList) {
+        unordered_set<string> st(wordList.begin(), wordList.end());
+        queue<string> q;
+        b = beginWord;
+        q.push({beginWord});
+        mpp[beginWord] = 1;
+        int sizee = beginWord.size();
+        st.erase(beginWord);
+        while(!q.empty()) {
+            string word = q.front();
+            int steps = mpp[word];
+            q.pop();
+            if(word == endWord) break;
+            for(int i = 0; i < sizee; i++) {
+                char original = word[i];
+                for(char ch = 'a'; ch <= 'z'; ch++){
+                    word[i] = ch;
+                    if(st.count(word)) {
+                        q.push(word);
+                        st.erase(word);
+                        mpp[word] = steps + 1;
+                    }
+                }
+                word[i] = original;
+            }
+        }
+        for(auto it : mpp) cout << it.first << " " << it.second << endl;
+        if(mpp.find(endWord) != mpp.end()) {
+            vector<string> seq;
+            seq.push_back(endWord);
+            dfs(endWord, seq);
+        }
+        return ans;
+    }
+};
+
+
+
+
+32. Dijkstra's Algorithm - Using Priority Queue
+_______________________________________________
+
+class Solution
+{
+  public:
+    vector <int> dijkstra(int V, vector<vector<int>> adj[], int S)
+    {
+        priority_queue<pair<int, int>, vector<pair<int,int>>, greater<pair<int, int>>> pq;
+        vector<int> dist(V,1e9);
+        dist[S] = 0;
+        pq.push({0,S});
+        
+        while(!pq.empty()) {
+            int dis = pq.top().first;
+            int node = pq.top().second;
+            pq.pop();
+            
+            for(auto it : adj[node]) {
+                int edgeWeight = it[1];
+                int adjNode = it[0];
+                
+                if(dis + edgeWeight < dist[adjNode]) {
+                    dist[adjNode] = dis + edgeWeight;
+                    pq.push({dist[adjNode], adjNode});
+                }
+            }
+        }
+        return dist;
+    }
+};
